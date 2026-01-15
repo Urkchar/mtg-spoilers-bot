@@ -1,0 +1,19 @@
+# --- Python & build ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.build/
+dist/
+.venv/
+venv/
+
+# --- IDEs/OS ---
+.vscode/
+.idea/
+.DS_Store
+
+# --- Project-specific (bot) ---
+.env
+.env.*
+state.json
+bulk_cache/

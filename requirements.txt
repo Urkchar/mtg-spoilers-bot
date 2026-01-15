@@ -1,0 +1,17 @@
+# ---- Runtime (spoilers bot) ----
+# discord.py 2.x is the current async API wrapper used by the bot.
+discord.py>=2.3,<3.0
+
+# aiohttp is used for async HTTP (Scryfall bulk downloads).
+aiohttp>=3.9,<4.0
+
+# python-dotenv loads .env config in config.py.
+python-dotenv>=1.0,<2.0
+
+# tzdata provides IANA timezone data for Windows (safe cross‑platform default).
+tzdata>=2024.1
+
+# ---- Optional: if you also run the Wizards news scraper task ----
+# beautifulsoup4 parses HTML when scraping the news archive.
+# Uncomment if/when you enable that task.
+# beautifulsoup4>=4.12,<5.0
