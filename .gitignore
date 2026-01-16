@@ -14,6 +14,5 @@ venv/
 
 # --- Project-specific (bot) ---
 .env
-.env
 state.json
 bulk_cache/
