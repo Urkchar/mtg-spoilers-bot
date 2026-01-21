@@ -1,3 +1,4 @@
+
 import os
 import sys
 import json
@@ -6,6 +7,7 @@ import aiohttp
 import tempfile
 from datetime import datetime
 from typing import Optional
+from urllib.parse import urlparse, parse_qs
 from bs4 import BeautifulSoup
 from discord.ext import tasks
 
@@ -79,6 +81,22 @@ def persist_seen_link_atomic(path: str, link: str) -> None:
         save_store_atomic(path, store)
 
 # ----- scraping & routing -----
+def _is_author_archive_link(link: str) -> bool:
+    """
+    Return True for links that point to the archive page filtered by author,
+    e.g., /en/news/archive?author=Mark+Rosewater
+    """
+    try:
+        parsed = urlparse(link)
+        path = (parsed.path or "").rstrip("/")
+        if path == "/en/news/archive":
+            qs = parse_qs(parsed.query or "")
+            return "author" in qs
+        return False
+    except Exception:
+        # If parsing fails, err on the side of posting (do not block).
+        return False
+
 async def fetch_archive_links(session: aiohttp.ClientSession) -> list[str]:
     """
     Return a list of relative hrefs anchored under /en/news/... from the archive page.
@@ -95,7 +113,10 @@ async def fetch_archive_links(session: aiohttp.ClientSession) -> list[str]:
     soup = BeautifulSoup(html, "html.parser")
     # CSS selector: only anchors whose href starts with /en/news/
     anchors = soup.select('a[href^="/en/news/"]')
-    return [a.get("href") for a in anchors if a.get("href")]
+    links = [a.get("href") for a in anchors if a.get("href")]
+    # Filter out author-filtered archive pages
+    links = [h for h in links if not _is_author_archive_link(h)]
+    return links
 
 def make_absolute(link: str) -> str:
     return (BASE_URL + link) if link.startswith("/") else link
@@ -134,6 +155,9 @@ def setup_hourly_news(bot):
                     continue  # already handled
                 # We now send all /en/news/... links to the single channel
                 if not link.startswith("/en/news/"):
+                    continue
+                # Defense-in-depth: also skip author-filtered archive links here
+                if _is_author_archive_link(link):
                     continue
 
                 url = make_absolute(link)
