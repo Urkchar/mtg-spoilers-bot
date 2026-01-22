@@ -16,9 +16,8 @@ def main():
     # Register commands and events
     register_handlers(bot, cfg)
 
-    # Build and start the daily task once the bot is up
+    # Build and start the tasks once the bot is up
     daily_post = setup_daily_post(bot, cfg)
-
     hourly_news = setup_hourly_news(bot)
 
     @bot.event
