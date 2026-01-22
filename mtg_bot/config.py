@@ -37,8 +37,8 @@ def load_config() -> Config:
     if not token:
         sys.exit("Missing required env var: DISCORD_TOKEN")
 
-    mtg_id = _require_int("MTG_SPOILERS_CHANNEL_ID", os.getenv("MTG_SPOILERS_CHANNEL_ID", "1255377756129071178"))
-    ub_id  = _require_int("UB_SPOILERS_CHANNEL_ID",  os.getenv("UB_SPOILERS_CHANNEL_ID",  "1458709510708396285"))
+    mtg_id = _require_int("MTG_SPOILERS_CHANNEL_ID", os.getenv("MTG_SPOILERS_CHANNEL_ID"))
+    ub_id  = _require_int("UB_SPOILERS_CHANNEL_ID",  os.getenv("UB_SPOILERS_CHANNEL_ID"))
     test_id= _require_int("BOT_TESTING_CHANNEL_ID")
 
     post_hour   = _require_int("POST_HOUR", "9")
