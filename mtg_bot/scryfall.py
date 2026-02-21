@@ -74,10 +74,9 @@ def is_recent(card: dict, since_date: date) -> bool:
     return recent_release or recent_preview
 
 def is_ub(card: dict) -> bool:
+    # TODO Some UB cards don't have the "promo_types" field
     promo = card.get("promo_types") or []
-    if "universesbeyond" in promo:
-        return True
-    return (card.get("set_type") == "universes_beyond")
+    return "universesbeyond" in promo
 
 def filter_recent_cards(bulk_json_path: str, since_date: date) -> list[dict]:
     with open(bulk_json_path, "r", encoding="utf-8") as f:
