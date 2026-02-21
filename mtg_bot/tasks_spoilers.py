@@ -11,8 +11,8 @@ def setup_daily_post(bot, cfg: Config):
     async def daily_post():
         await bot.wait_until_ready()
         testing_channel = bot.get_channel(cfg.bot_testing_channel_id)
-        ub_channel     = bot.get_channel(cfg.ub_spoilers_channel_id)
-        reg_channel    = bot.get_channel(cfg.mtg_spoilers_channel_id)
+        ub_channel      = bot.get_channel(cfg.ub_spoilers_channel_id)
+        reg_channel     = bot.get_channel(cfg.mtg_spoilers_channel_id)
 
         if testing_channel is None and ub_channel is None and reg_channel is None:
             print("[daily_post] No channels available; aborting run.")
@@ -30,11 +30,11 @@ def setup_daily_post(bot, cfg: Config):
         ub_cards = [c for c in recent_cards if is_ub(c)]
         rg_cards = [c for c in recent_cards if not is_ub(c)]
 
-        if testing_channel:
-            await testing_channel.send(
-                f"Debug: since_date={since_date}, bulk_updated_at={bulk_updated_at}, "
-                f"recent_total={len(recent_cards)}, ub={len(ub_cards)}, regular={len(rg_cards)}"
-            )
+        # if testing_channel:
+        #     await testing_channel.send(
+        #         f"Debug: since_date={since_date}, bulk_updated_at={bulk_updated_at}, "
+        #         f"recent_total={len(recent_cards)}, ub={len(ub_cards)}, regular={len(rg_cards)}"
+        #     )
 
         if not recent_cards:
             if testing_channel:
