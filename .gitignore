@@ -15,4 +15,5 @@ venv/
 # --- Project-specific (bot) ---
 .env
 state.json
+articles.json
 bulk_cache/
