@@ -19,6 +19,7 @@ STORE_PATH = "articles.json"  # JSON store for seen links
 # Single target Discord channel for all articles
 NEWS_CHANNEL_ENV = "MTG_NEWS_CHANNEL_ID"
 
+
 def load_news_channel_id() -> int:
     raw = os.getenv(NEWS_CHANNEL_ENV)
     if raw is None:
@@ -28,9 +29,10 @@ def load_news_channel_id() -> int:
     except ValueError:
         sys.exit(f"Invalid integer for {NEWS_CHANNEL_ENV}: {raw!r}")
 
-# ----- JSON store helpers (crash-safe, atomic writes) -----
+
 def _default_store() -> dict:
     return {"seen_links": []}
+
 
 def load_store(path: str) -> dict:
     """Load JSON store safely; return default schema if file is missing/corrupt."""
@@ -48,6 +50,7 @@ def load_store(path: str) -> dict:
         # corrupted or unreadable file: fall back to fresh store
         return _default_store()
 
+
 def save_store_atomic(path: str, payload: dict) -> None:
     """
     Atomically write the whole JSON store:
@@ -56,7 +59,8 @@ def save_store_atomic(path: str, payload: dict) -> None:
     3) os.replace to target
     """
     dirpath = os.path.dirname(os.path.abspath(path)) or "."
-    fd, tmpname = tempfile.mkstemp(dir=dirpath, prefix=".tmp_articles_", text=True)
+    fd, tmpname = tempfile.mkstemp(
+        dir=dirpath, prefix=".tmp_articles_", text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as wf:
             json.dump(payload, wf, ensure_ascii=False, indent=2)
@@ -70,6 +74,7 @@ def save_store_atomic(path: str, payload: dict) -> None:
         except Exception:
             pass
 
+
 def persist_seen_link_atomic(path: str, link: str) -> None:
     """
     Per-post persistence: reload store, append link if new, save atomically.
@@ -80,7 +85,7 @@ def persist_seen_link_atomic(path: str, link: str) -> None:
         store["seen_links"].append(link)
         save_store_atomic(path, store)
 
-# ----- scraping & routing -----
+
 def _is_author_archive_link(link: str) -> bool:
     """
     Return True for links that point to the archive page filtered by author,
@@ -96,6 +101,7 @@ def _is_author_archive_link(link: str) -> bool:
     except Exception:
         # If parsing fails, err on the side of posting (do not block).
         return False
+
 
 async def fetch_archive_links(session: aiohttp.ClientSession) -> list[str]:
     """
@@ -118,10 +124,11 @@ async def fetch_archive_links(session: aiohttp.ClientSession) -> list[str]:
     links = [h for h in links if not _is_author_archive_link(h)]
     return links
 
+
 def make_absolute(link: str) -> str:
     return (BASE_URL + link) if link.startswith("/") else link
 
-# ----- the hourly task (closure-based setup, mirrors tasks_spoilers.py) -----
+
 def setup_hourly_news(bot):
     """
     Build and return the hourly news loop bound to `bot`.

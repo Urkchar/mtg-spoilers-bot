@@ -1,4 +1,5 @@
-import asyncio, aiohttp
+import asyncio
+import aiohttp
 from datetime import datetime, timedelta, time as timeobj
 from discord.ext import tasks
 
@@ -25,7 +26,8 @@ def setup_daily_post(bot, cfg: Config):
         since_date = (now_local.date() - timedelta(days=cfg.window_days))
 
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=120)) as session:
-            bulk = BulkScryfall(session, cfg.bulk_meta_path, cfg.bulk_file_path)
+            bulk = BulkScryfall(
+                session, cfg.bulk_meta_path, cfg.bulk_file_path)
             _, bulk_updated_at = await bulk.ensure_bulk_file()
             recent_cards = filter_recent_cards(cfg.bulk_file_path, since_date)
 

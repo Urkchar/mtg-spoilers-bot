@@ -3,6 +3,7 @@ from .scryfall import card_image
 
 DEFAULT_COLOR = 0x2B6CB0
 
+
 def card_embed(card: dict) -> discord.Embed:
     """Build a Discord embed for a card. No UB-specific styling."""
     color = DEFAULT_COLOR

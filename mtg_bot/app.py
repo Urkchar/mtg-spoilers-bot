@@ -6,6 +6,7 @@ from .tasks_articles import setup_hourly_news
 
 from .commands_spoilers import register_handlers
 
+
 def main():
     cfg = load_config()
 
@@ -30,6 +31,7 @@ def main():
             hourly_news.start()
 
     bot.run(cfg.discord_token)
+
 
 if __name__ == "__main__":
     main()

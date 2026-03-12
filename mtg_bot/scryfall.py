@@ -1,4 +1,6 @@
-import os, json, aiohttp
+import os
+import json
+import aiohttp
 from datetime import date
 
 USER_AGENT = "RileysScryfallDiscordBot/1.0 (bulk default cards)"
@@ -39,7 +41,8 @@ class BulkScryfall:
         if need_download:
             await self._download_bulk(download_uri, self.bulk_file_path)
             with open(self.bulk_meta_path, "w", encoding="utf-8") as f:
-                json.dump({"download_uri": download_uri, "updated_at": updated_at}, f, indent=2)
+                json.dump({"download_uri": download_uri,
+                          "updated_at": updated_at}, f, indent=2)
         return download_uri, updated_at
 
     async def _download_bulk(self, url: str, dest: str):

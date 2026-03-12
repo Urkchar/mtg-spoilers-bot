@@ -1,10 +1,12 @@
-import os, sys
+import os
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 @dataclass(frozen=True)
 class Config:
@@ -21,6 +23,7 @@ class Config:
     state_path: str
     post_delay_ms: int
 
+
 def _require_int(name: str, default: str | None = None) -> int:
     raw = os.getenv(name, default)
     if raw is None:
@@ -31,12 +34,14 @@ def _require_int(name: str, default: str | None = None) -> int:
         sys.exit(f"Invalid integer for {name}: {raw!r}")
     return val
 
+
 def load_config() -> Config:
     token = os.getenv("DISCORD_TOKEN")
     if not token:
         sys.exit("Missing required env var: DISCORD_TOKEN")
 
-    mtg_id = _require_int("MTG_SPOILERS_CHANNEL_ID", os.getenv("MTG_SPOILERS_CHANNEL_ID"))
+    mtg_id = _require_int("MTG_SPOILERS_CHANNEL_ID",
+                          os.getenv("MTG_SPOILERS_CHANNEL_ID"))
     test_id = _require_int("BOT_TESTING_CHANNEL_ID")
 
     post_hour = _require_int("POST_HOUR", "9")
@@ -66,6 +71,7 @@ def load_config() -> Config:
         state_path=state_path,
         post_delay_ms=post_delay,
     )
+
 
 def safe_tz(tz_key: str) -> timezone:
     try:

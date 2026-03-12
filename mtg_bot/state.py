@@ -1,12 +1,17 @@
-import json, os, tempfile
+import json
+import os
+import tempfile
 from typing import TypedDict
+
 
 class StateDict(TypedDict, total=False):
     last_run_date: str | None
     posted_ids: list[str]
 
+
 def _default_state() -> StateDict:
     return {"last_run_date": None, "posted_ids": []}
+
 
 def load_state(path: str) -> StateDict:
     if not os.path.exists(path):
@@ -24,9 +29,11 @@ def load_state(path: str) -> StateDict:
     except Exception:
         return _default_state()
 
+
 def save_state_atomic(path: str, payload: StateDict) -> None:
     dirpath = os.path.dirname(os.path.abspath(path)) or "."
-    fd, tmpname = tempfile.mkstemp(dir=dirpath, prefix=".tmp_state_", text=True)
+    fd, tmpname = tempfile.mkstemp(
+        dir=dirpath, prefix=".tmp_state_", text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as wf:
             json.dump(payload, wf, ensure_ascii=False, indent=2)
@@ -40,9 +47,11 @@ def save_state_atomic(path: str, payload: StateDict) -> None:
         except Exception:
             pass
 
+
 def has_been_posted(state: StateDict, card: dict) -> bool:
     cid = card.get("id")
     return cid is not None and cid in (state.get("posted_ids") or [])
+
 
 def persist_posted(path: str, state: StateDict, card: dict) -> StateDict:
     cid = card.get("id")

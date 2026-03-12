@@ -1,10 +1,12 @@
-import asyncio, aiohttp
+import asyncio
+import aiohttp
 from datetime import datetime, timedelta
 
 from .config import Config, safe_tz
 from .scryfall import BulkScryfall, filter_recent_cards
 from .embeds import card_embed
 from .state import load_state, save_state_atomic, has_been_posted, persist_posted
+
 
 def register_handlers(bot, cfg: Config):
     @bot.event
@@ -22,7 +24,8 @@ def register_handlers(bot, cfg: Config):
         testing_channel = bot.get_channel(cfg.bot_testing_channel_id)
 
         # Owner-only gate
-        is_owner = (message.guild is not None and message.guild.owner_id == message.author.id)
+        is_owner = (
+            message.guild is not None and message.guild.owner_id == message.author.id)
         if not is_owner:
             if testing_channel:
                 await testing_channel.send(
@@ -36,7 +39,8 @@ def register_handlers(bot, cfg: Config):
         since_date = (now_local.date() - timedelta(days=cfg.window_days))
 
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=120)) as session:
-            bulk = BulkScryfall(session, cfg.bulk_meta_path, cfg.bulk_file_path)
+            bulk = BulkScryfall(
+                session, cfg.bulk_meta_path, cfg.bulk_file_path)
             _, bulk_updated_at = await bulk.ensure_bulk_file()
             previews = filter_recent_cards(cfg.bulk_file_path, since_date)
 
