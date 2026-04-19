@@ -1,10 +1,11 @@
 import discord
+from discord.ext import commands
 from .config import load_config
 
 from .tasks_spoilers import setup_daily_post
 from .tasks_articles import setup_hourly_news
 
-from .commands_spoilers import register_handlers
+from .commands_spoilers import setup_commands
 
 
 def main():
@@ -12,10 +13,10 @@ def main():
 
     intents = discord.Intents.default()
     intents.message_content = True
-    bot = discord.Client(intents=intents)
+    bot = commands.Bot(command_prefix="!", intents=intents)
 
     # Register commands and events
-    register_handlers(bot, cfg)
+    setup_commands(bot, cfg)
 
     # Build and start the tasks once the bot is up
     daily_post = setup_daily_post(bot, cfg)
@@ -23,6 +24,7 @@ def main():
 
     @bot.event
     async def on_ready():
+        print(f"Logged in as {bot.user} (ID: {bot.user.id})")
         # start scheduled task if not already running
         if not daily_post.is_running():
             daily_post.start()
