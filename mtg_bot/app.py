@@ -2,8 +2,7 @@ import discord
 from discord.ext import commands
 from .config import load_config
 
-from .tasks_spoilers import setup_daily_post
-from .tasks_articles import setup_hourly_news
+from .tasks import setup_daily_post, setup_hourly_news
 
 from .commands_spoilers import setup_commands
 
