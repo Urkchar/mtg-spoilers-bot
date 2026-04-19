@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 
 from .config import Config
-from .state import StateDict, load_state, save_state_atomic, has_been_posted, persist_posted
+from .state import StateDict, save_state_atomic, has_been_posted, persist_posted
 from .embeds import card_embed
 
 
