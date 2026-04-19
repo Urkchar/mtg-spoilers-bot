@@ -1,11 +1,10 @@
-import asyncio
 import aiohttp
 from datetime import datetime, timedelta
 
+from mtg_bot.state import load_state
 from .config import Config, safe_tz
 from .scryfall import BulkScryfall, filter_recent_cards
-from .embeds import card_embed
-from .state import load_state, save_state_atomic, has_been_posted, persist_posted
+from .posting import post_cards_to_channel, check_and_post_preview
 
 
 def register_handlers(bot, cfg: Config):
@@ -52,55 +51,12 @@ def register_handlers(bot, cfg: Config):
                 )
 
             if content == "!check-now":
-                if not previews:
-                    if testing_channel:
-                        await testing_channel.send(
-                            f"No new spoilers/releases on/after {since_date} (Bulk updated: {bulk_updated_at})."
-                        )
-                    return
-                card = previews[0]
-                embed = card_embed(card)
-                if testing_channel:
-                    await testing_channel.send(embed=embed)
-                    await testing_channel.send(
-                        f"✅ Posted 1 item (newest). since_date={since_date} (Bulk updated: {bulk_updated_at})."
-                    )
+                await check_and_post_preview(previews, testing_channel, since_date, bulk_updated_at)
                 return
 
             # !post-all -> post every new preview to ONE channel
             post_channel = bot.get_channel(cfg.mtg_spoilers_channel_id)
-            if not post_channel:
-                if testing_channel:
-                    await testing_channel.send("⚠️ Spoilers channel not found; cannot post embeds.")
-                return
-
-            if not previews:
-                st = load_state(cfg.state_path)
-                st["last_run_date"] = now_local.date().isoformat()
-                save_state_atomic(cfg.state_path, st)
-                if testing_channel:
-                    await testing_channel.send(
-                        f"No new spoilers/releases on/after {since_date} (Bulk updated: {bulk_updated_at})."
-                    )
-                return
-
-            delay_s = max(0.0, cfg.post_delay_ms / 1000.0)
-            posted_total = 0
-
             st = load_state(cfg.state_path)
-            for card in previews:
-                if has_been_posted(st, card):
-                    continue
-                await post_channel.send(embed=card_embed(card))
-                posted_total += 1
-                st = persist_posted(cfg.state_path, st, card)
-                if delay_s > 0:
-                    await asyncio.sleep(delay_s)
-
-            st["last_run_date"] = now_local.date().isoformat()
-            save_state_atomic(cfg.state_path, st)
-
-            if testing_channel:
-                await testing_channel.send(
-                    f"✅ Posted {posted_total} item(s). since_date={since_date} (Bulk updated: {bulk_updated_at})."
-                )
+            await post_cards_to_channel(
+                previews, post_channel, testing_channel, cfg, st, since_date, bulk_updated_at
+            )
